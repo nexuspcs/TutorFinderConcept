@@ -6,22 +6,52 @@
     <!-- Add CSS and JS links here -->
 </head>
 <style>
-     body {
+    body {
             font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            padding: 1em;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
         }
 
         form {
+            display: flex;
+            justify-content: space-around;
             margin-bottom: 2em;
+            background-color: #fff;
+            padding: 1em;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        input[type=submit] {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        input[type=submit]:hover {
+            background-color: #0056b3;
         }
 
         .tutor {
             border: 1px solid #ddd;
             padding: 1em;
             margin-bottom: 1em;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
         }
 
         .tutor h2 {
             margin-top: 0;
+            color: #007BFF;
         }
 </style>
 <body>
