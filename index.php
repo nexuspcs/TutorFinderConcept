@@ -65,7 +65,10 @@
         <input type="number" id="distance" name="distance">
         <input type="submit" value="Search">
     </form>
-
+<!-- Clear filters form -->
+<form action="" method="post">
+        <input type="submit" value="Clear filters">
+    </form>
     <?php
      
     session_start();
