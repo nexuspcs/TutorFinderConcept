@@ -32,15 +32,19 @@
 
             // Loop through the tutors and display the ones that match the search criteria
             foreach ($tutors as $tutor) {
-                if ($tutor['subject'] == $subject && $tutor['price'] <= $price && $tutor['distance'] <= $distance) {
+                if ((empty($subject) || strtolower($tutor['subject']) == strtolower($subject)) &&
+                    (empty($price) || $tutor['price'] <= $price) &&
+                    (empty($distance) || $tutor['distance'] <= $distance)) {
                     echo "<div>";
                     echo "<h2>" . $tutor['name'] . "</h2>";
                     echo "<p>Subject: " . $tutor['subject'] . "</p>";
                     echo "<p>Price: $" . $tutor['price'] . "/hour</p>";
-                    echo "<p>Distance: " . $tutor['distance'] . " miles</p>";
+                    echo "<p>Distance: " . $tutor['distance'] . " kilometres</p>";
                     echo "</div>";
                 }
             }
+            
+            
         }
     ?>
 </body>
