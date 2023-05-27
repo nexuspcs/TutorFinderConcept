@@ -5,7 +5,25 @@
     <title>Online Tutoring Marketplace</title>
     <!-- Add CSS and JS links here -->
 </head>
+<style>
+     body {
+            font-family: Arial, sans-serif;
+        }
 
+        form {
+            margin-bottom: 2em;
+        }
+
+        .tutor {
+            border: 1px solid #ddd;
+            padding: 1em;
+            margin-bottom: 1em;
+        }
+
+        .tutor h2 {
+            margin-top: 0;
+        }
+</style>
 <body>
     <h1>Online Tutoring Marketplace</h1>
     <form action="index.php" method="post">
