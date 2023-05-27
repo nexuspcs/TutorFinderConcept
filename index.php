@@ -39,6 +39,9 @@
                 (empty($price) || $tutor['price'] <= $price) &&
                 (empty($distance) || $tutor['distance'] <= $distance);
         });
+        if (count($tutors) === 0) {
+            echo "<p>No tutors matched your search criteria. Please try again.</p>";
+        }
     }
 
     // Loop through the tutors and display them
