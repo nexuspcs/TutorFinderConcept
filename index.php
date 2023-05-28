@@ -93,9 +93,9 @@
 
     // Always display tutors by default
     $tutors = array(
-        array('name' => 'Alice', 'subject' => 'Math', 'price' => 20, 'distance' => 5, 'latitude' => -33.655956, 'longitude' => 151.314588),
-        array('name' => 'Bob', 'subject' => 'English', 'price' => 25, 'distance' => 10, 'latitude' => 38.9072, 'longitude' => -77.0369),
-        array('name' => 'Charlie', 'subject' => 'Coding', 'price' => 30, 'distance' => 15, 'latitude' => 51.5074, 'longitude' => -0.1278),
+        array('name' => 'p1', 'subject' => 'Math', 'price' => 20, 'distance' => 5, 'latitude' => -33.655956, 'longitude' => 151.314588),
+        array('name' => 'p2', 'subject' => 'English', 'price' => 25, 'distance' => 10, 'latitude' => 39.9072, 'longitude' => -77.0369),
+        array('name' => 'p3', 'subject' => 'Coding', 'price' => 30, 'distance' => 15, 'latitude' => 51.5074, 'longitude' => -0.1278),
     );
 
     // If form is submitted, filter tutors based on input
