@@ -76,7 +76,7 @@
 
     // Always display tutors by default
     $tutors = array(
-        array('name' => 'Alice', 'subject' => 'Math', 'price' => 20, 'distance' => 5, 'latitude' => 37.7749, 'longitude' => -122.4194),
+        array('name' => 'Alice', 'subject' => 'Math', 'price' => 20, 'distance' => 5, 'latitude' => -33.655956, 'longitude' => 151.314588),
         array('name' => 'Bob', 'subject' => 'English', 'price' => 25, 'distance' => 10, 'latitude' => 38.9072, 'longitude' => -77.0369),
         array('name' => 'Charlie', 'subject' => 'Coding', 'price' => 30, 'distance' => 15, 'latitude' => 51.5074, 'longitude' => -0.1278),
     );
@@ -108,38 +108,55 @@
     // If no tutors matched the search criteria, display a message
     if (empty($tutors)) {
         echo "<p>No tutors matched your search criteria. Please try again.</p>";
-    }
+    } else {
+        // Calculate distance from user's actual location
+        echo '<script>
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function (position) {
+                    const userLatitude = position.coords.latitude;
+                    const userLongitude = position.coords.longitude;
+                    calculateDistances(userLatitude, userLongitude);
+                });
+            } else {
+                console.log("Geolocation is not supported by this browser.");
+            }
 
-    // Calculate distance from user's actual location
-    function calculateDistance($latitude1, $longitude1, $latitude2, $longitude2)
-    {
-        $earthRadius = 6371; // in kilometers
+            function calculateDistances(userLatitude, userLongitude) {
+                var tutors = ' . json_encode($tutors) . ';
 
-        $latDiff = deg2rad($latitude2 - $latitude1);
-        $lonDiff = deg2rad($longitude2 - $longitude1);
+                for (let i = 0; i < tutors.length; i++) {
+                    const tutor = tutors[i];
+                    const distance = calculateDistance(userLatitude, userLongitude, tutor.latitude, tutor.longitude);
+                    tutor.distanceFromUser = Math.round(distance * 100) / 100;
 
-        $a = sin($latDiff / 2) * sin($latDiff / 2) + cos(deg2rad($latitude1)) * cos(deg2rad($latitude2)) * sin($lonDiff / 2) * sin($lonDiff / 2);
-        $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+                    const tutorElement = document.createElement("div");
+                    tutorElement.innerHTML = "<h2>" + tutor.name + "</h2>" +
+                        "<p>Subject: " + tutor.subject + "</p>" +
+                        "<p>Price: $" + tutor.price + "/hour</p>" +
+                        "<p>Distance from your location: " + tutor.distanceFromUser + " kms</p>";
 
-        $distance = $earthRadius * $c;
+                    document.body.appendChild(tutorElement);
+                }
+            }
 
-        return $distance;
-    }
+            function calculateDistance(latitude1, longitude1, latitude2, longitude2) {
+                const earthRadius = 6371; // in kilometers
 
-    // User's actual location
-    $userLatitude = 37.7749; // Replace with actual latitude
-    $userLongitude = -122.4194; // Replace with actual longitude
+                const latDiff = deg2rad(latitude2 - latitude1);
+                const lonDiff = deg2rad(longitude2 - longitude1);
 
-    // Calculate and display the distance from user's location for each tutor
-    foreach ($tutors as &$tutor) {
-        $tutor['distanceFromUser'] = calculateDistance($userLatitude, $userLongitude, $tutor['latitude'], $tutor['longitude']);
-        $tutor['distanceFromUser'] = round($tutor['distanceFromUser'], 2);
-        echo "<div>";
-        echo "<h2>" . $tutor['name'] . "</h2>";
-        echo "<p>Subject: " . $tutor['subject'] . "</p>";
-        echo "<p>Price: $" . $tutor['price'] . "/hour</p>";
-        echo "<p>Distance from your location: " . $tutor['distanceFromUser'] . " kms</p>";
-        echo "</div>";
+                const a = Math.sin(latDiff / 2) * Math.sin(latDiff / 2) + Math.cos(deg2rad(latitude1)) * Math.cos(deg2rad(latitude2)) * Math.sin(lonDiff / 2) * Math.sin(lonDiff / 2);
+                const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+                const distance = earthRadius * c;
+
+                return distance;
+            }
+
+            function deg2rad(deg) {
+                return deg * (Math.PI / 180);
+            }
+        </script>';
     }
     ?>
 
