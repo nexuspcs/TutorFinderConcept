@@ -3,57 +3,74 @@
 
 <head>
     <title>Online Tutoring Marketplace</title>
-    <!-- Add CSS and JS links here -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            padding: 1em;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+
+        form {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 2em;
+            background-color: #fff;
+            padding: 1em;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        input[type=submit] {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        input[type=submit]:hover {
+            background-color: #0056b3;
+        }
+
+        .tutor {
+            display: flex;
+            border: 1px solid #ddd;
+            padding: 1em;
+            margin-bottom: 1em;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .tutor h2 {
+            margin-top: 0;
+            color: #007BFF;
+        }
+
+        .map-container {
+            width: 300px;
+            height: 200px;
+            margin-left: 1em;
+        }
+
+        .error-message {
+            color: red;
+            margin-bottom: 1em;
+        }
+
+        .manual-address {
+            margin-top: 1em;
+        }
+    </style>
+    <!-- Add Leaflet.js CSS link here -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
 </head>
-<style>
-    body {
-        font-family: Arial, sans-serif;
-        background-color: #f5f5f5;
-        padding: 1em;
-    }
-
-    h1 {
-        color: #333;
-        text-align: center;
-    }
-
-    form {
-        display: flex;
-        justify-content: space-around;
-        margin-bottom: 2em;
-        background-color: #fff;
-        padding: 1em;
-        border-radius: 8px;
-        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-    }
-
-    input[type=submit] {
-        background-color: #007BFF;
-        color: white;
-        border: none;
-        padding: 10px 20px;
-        border-radius: 5px;
-        cursor: pointer;
-    }
-
-    input[type=submit]:hover {
-        background-color: #0056b3;
-    }
-
-    .tutor {
-        border: 1px solid #ddd;
-        padding: 1em;
-        margin-bottom: 1em;
-        background-color: #fff;
-        border-radius: 8px;
-        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-    }
-
-    .tutor h2 {
-        margin-top: 0;
-        color: #007BFF;
-    }
-</style>
 
 <body>
     <h1>Online Tutoring Marketplace</h1>
@@ -112,13 +129,42 @@
         // Calculate distance from user's actual location
         echo '<script>
             if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(function (position) {
-                    const userLatitude = position.coords.latitude;
-                    const userLongitude = position.coords.longitude;
-                    calculateDistances(userLatitude, userLongitude);
-                });
+                navigator.geolocation.getCurrentPosition(successCallback, errorCallback);
             } else {
                 console.log("Geolocation is not supported by this browser.");
+            }
+
+            function successCallback(position) {
+                const userLatitude = position.coords.latitude;
+                const userLongitude = position.coords.longitude;
+                calculateDistances(userLatitude, userLongitude);
+            }
+
+            function errorCallback(error) {
+                if (error.code === error.PERMISSION_DENIED) {
+                    const errorMessage = document.createElement("div");
+                    errorMessage.className = "error-message";
+                    errorMessage.innerText = "Location access denied. Please enter your address manually.";
+
+                    document.body.appendChild(errorMessage);
+
+                    const manualAddressForm = document.createElement("form");
+                    manualAddressForm.className = "manual-address";
+                    manualAddressForm.innerHTML = "<label for=\"address\">Address:</label>" +
+                        "<input type=\"text\" id=\"address\" name=\"address\">" +
+                        "<input type=\"submit\" value=\"Submit\">";
+
+                    manualAddressForm.addEventListener("submit", function (event) {
+                        event.preventDefault();
+                        const addressInput = document.getElementById("address");
+                        const address = addressInput.value;
+
+                        // Call a function to convert address to latitude and longitude
+                        convertAddressToCoordinates(address);
+                    });
+
+                    document.body.appendChild(manualAddressForm);
+                }
             }
 
             function calculateDistances(userLatitude, userLongitude) {
@@ -130,10 +176,19 @@
                     tutor.distanceFromUser = Math.round(distance * 100) / 100;
 
                     const tutorElement = document.createElement("div");
-                    tutorElement.innerHTML = "<h2>" + tutor.name + "</h2>" +
+                    tutorElement.className = "tutor";
+                    tutorElement.innerHTML = "<div>" +
+                        "<h2>" + tutor.name + "</h2>" +
                         "<p>Subject: " + tutor.subject + "</p>" +
                         "<p>Price: $" + tutor.price + "/hour</p>" +
-                        "<p>Distance from your location: " + tutor.distanceFromUser + " kms</p>";
+                        "<p>Distance from your location: " + tutor.distanceFromUser + " kms</p>" +
+                        "</div>";
+
+                    const mapContainer = document.createElement("div");
+                    mapContainer.className = "map-container";
+                    tutorElement.appendChild(mapContainer);
+
+                    createMap(mapContainer, tutor.latitude, tutor.longitude);
 
                     document.body.appendChild(tutorElement);
                 }
@@ -156,10 +211,29 @@
             function deg2rad(deg) {
                 return deg * (Math.PI / 180);
             }
+
+            function createMap(container, latitude, longitude) {
+                const map = L.map(container).setView([latitude, longitude], 12);
+
+                L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+                    attribution: "Map data © <a href=\"https://openstreetmap.org\">OpenStreetMap</a> contributors",
+                    maxZoom: 18,
+                }).addTo(map);
+
+                L.marker([latitude, longitude]).addTo(map);
+            }
+
+            function convertAddressToCoordinates(address) {
+                // Call an API or perform the necessary operations to convert the address to latitude and longitude
+                // Once you have the latitude and longitude, you can proceed with the rest of the logic
+                console.log("Converting address to coordinates:", address);
+            }
         </script>';
     }
     ?>
 
+    <!-- Add Leaflet.js library script here -->
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
 </body>
 
 </html>
