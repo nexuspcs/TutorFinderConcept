@@ -128,6 +128,7 @@
     } else {
         // Calculate distance from user's actual location
         echo '<script>
+            console.log("loading users locational data");
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(successCallback, errorCallback);
             } else {
@@ -136,8 +137,11 @@
 
             function successCallback(position) {
                 const userLatitude = position.coords.latitude;
+                console.log("User lat", userLatitude);
                 const userLongitude = position.coords.longitude;
+                console.log("User long", userLongitude);
                 calculateDistances(userLatitude, userLongitude);
+                console.log("success");
             }
 
             function errorCallback(error) {
@@ -145,6 +149,7 @@
                     const errorMessage = document.createElement("div");
                     errorMessage.className = "error-message";
                     errorMessage.innerText = "Location access denied. Please enter your address manually.";
+                    console.log("error, no location access");
 
                     document.body.appendChild(errorMessage);
 
@@ -213,15 +218,19 @@
             }
 
             function createMap(container, latitude, longitude) {
-                const map = L.map(container).setView([latitude, longitude], 12);
-
+                const map = L.map(container, {
+                    center: [latitude, longitude],
+                    zoom: 12
+                });
+            
                 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
                     attribution: "Map data © <a href=\"https://openstreetmap.org\">OpenStreetMap</a> contributors",
                     maxZoom: 18,
                 }).addTo(map);
-
+            
                 L.marker([latitude, longitude]).addTo(map);
             }
+            
 
             function convertAddressToCoordinates(address) {
                 // Call an API or perform the necessary operations to convert the address to latitude and longitude
